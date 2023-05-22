@@ -9,18 +9,23 @@ use sqlx::postgres::PgPool;
 use sqlx::postgres::PgPoolOptions;
 
 async fn store_json_value(pool: &PgPool, key: &str, json_value: &Value) -> Result<(), sqlx::Error> {
-    // Convert JSON value to a serialized string
-    let json_string = json_value.to_string();
-
     // Acquire a connection from the connection pool
     let mut conn = pool.acquire().await?;
 
-    // Insert the JSON value into the database using a parameterized query
-    sqlx::query("INSERT INTO experiments (key, metadata) VALUES ($1, $2)")
+    // Delete current record if it exists
+    let result = sqlx::query("DELETE FROM experiments WHERE key=$1")
         .bind(key)
-        .bind(json_string)
         .execute(&mut conn)
         .await?;
+    println!("Delete result: {:?}", result);
+
+    // Insert the JSON value into the database using a parameterized query
+    let result = sqlx::query("INSERT INTO experiments (key, metadata) VALUES ($1, $2)")
+        .bind(key)
+        .bind(json_value)
+        .execute(&mut conn)
+        .await?;
+    println!("Insert result: {:?}", result);
 
     Ok(())
 }
@@ -29,7 +34,7 @@ async fn iterate_keys_in_s3_bucket(
     bucket_name: &str,
     endpoint: &str,
     prefix: &str,
-    _pool: &PgPool,
+    pool: &PgPool,
 ) -> Result<(), Box<dyn std::error::Error>> {
     // Configure the S3 client
     let region = Region::Custom {
@@ -68,6 +73,8 @@ async fn iterate_keys_in_s3_bucket(
                         let json_value: Value = serde_json::from_slice(&buffer)?;
                         println!("Key: {}", key);
                         println!("JSON Value: {:?}", json_value);
+
+                        store_json_value(&pool, &key, &json_value).await?;
                     }
                 }
             }
