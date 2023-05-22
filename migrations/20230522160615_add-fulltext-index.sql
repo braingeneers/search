@@ -1,0 +1,1 @@
+create index gin_metadata on experiments using gin(to_tsvector('english', metadata));

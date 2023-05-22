@@ -104,7 +104,8 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
 
     let bucket_name = "braingeneers";
     let endpoint = "https://s3-west.nrp-nautilus.io";
-    let prefix = "archive/2020-01-28";
+    // let prefix = "archive/2020-01-28";
+    let prefix = "archive/";
 
     iterate_keys_in_s3_bucket(bucket_name, endpoint, prefix, &pool).await?;
 
