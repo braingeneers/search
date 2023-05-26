@@ -1,10 +1,14 @@
 use dotenv::dotenv;
-use rusoto_core::Region;
-use rusoto_s3::{ListObjectsV2Request, S3Client, S3};
+use log::*;
 use std::{env, error};
+
 use tokio::io::AsyncReadExt;
 
 use serde_json::Value;
+
+use rusoto_core::Region;
+use rusoto_s3::{ListObjectsV2Request, S3Client, S3};
+
 use sqlx::postgres::PgPool;
 use sqlx::postgres::PgPoolOptions;
 
@@ -17,7 +21,7 @@ async fn store_json_value(pool: &PgPool, key: &str, json_value: &Value) -> Resul
         .bind(key)
         .execute(&mut conn)
         .await?;
-    println!("Delete result: {:?}", result);
+    trace!("Delete result: {:?}", result);
 
     // Insert the JSON value into the database using a parameterized query
     let result = sqlx::query("INSERT INTO experiments (key, metadata) VALUES ($1, $2)")
@@ -25,7 +29,7 @@ async fn store_json_value(pool: &PgPool, key: &str, json_value: &Value) -> Resul
         .bind(json_value)
         .execute(&mut conn)
         .await?;
-    println!("Insert result: {:?}", result);
+    trace!("Insert result: {:?}", result);
 
     Ok(())
 }
@@ -57,7 +61,6 @@ async fn iterate_keys_in_s3_bucket(
         if let Some(contents) = response.contents {
             for object in contents {
                 if let Some(key) = object.key {
-                    println!("Key: {}", key);
                     if key.ends_with(".json") {
                         let get_request = rusoto_s3::GetObjectRequest {
                             bucket: bucket_name.to_owned(),
@@ -71,8 +74,7 @@ async fn iterate_keys_in_s3_bucket(
                         body.into_async_read().read_to_end(&mut buffer).await?;
 
                         let json_value: Value = serde_json::from_slice(&buffer)?;
-                        println!("Key: {}", key);
-                        println!("JSON Value: {:?}", json_value);
+                        info!("Indexing key: {}", key);
 
                         store_json_value(&pool, &key, &json_value).await?;
                     }
@@ -98,6 +100,11 @@ async fn iterate_keys_in_s3_bucket(
 async fn main() -> Result<(), Box<dyn error::Error>> {
     dotenv().ok();
 
+    env_logger::builder()
+        .target(env_logger::Target::Stdout)
+        .init();
+
+    info!("Connecting to database...");
     let pool = PgPoolOptions::new()
         .connect(&env::var("DATABASE_URL").expect("Unable to connect to database"))
         .await?;
@@ -107,7 +114,11 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     // let prefix = "archive/2020-01-28";
     let prefix = "archive/";
 
+    info!("Indexing bucket: {} under {}...", bucket_name, prefix);
+
     iterate_keys_in_s3_bucket(bucket_name, endpoint, prefix, &pool).await?;
+
+    info!("Done.");
 
     Ok(())
 }

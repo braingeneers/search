@@ -1,24 +1,33 @@
-# search
-Prototype experiment search engine
+# Braingeneers Search
+Prototype experiment metadata search engine
 
 Recursively walks experiments in S3 storing any json found in a postgres database for structured and free form search.
 
-# Installation,
+# Develop
 [Rust](https://www.rust-lang.org/tools/install)
+
+# Running
+NOTE: Not ready for running off the shelf, but can get some running via:
+```
+docker-compose -f .devcontainer/docker-compose.yml
+```
 
 # Sample SQl Queries
 ```sql
 -- find all uuid's
-select metadata->'uuid' from experiments;
+select metadata->'uuid' from experiments limit 5;
 
 -- find all the 'num_wells' fields
 select distinct metadata->'num_wells' from experiments;
 
 -- Print out all the metadata pretty style
-select jsonb_pretty(metadata) from experiments;
+select jsonb_pretty(metadata) from experiments limit 5;
 
--- Search all metadata fields that start with 'awbg' 
+-- Find key for all metadata that has a field value that starts includes awbg:
 select metadata -> 'uuid' from experiments where to_tsvector('english', metadata) @@ to_tsquery('awbg:*');
+
+-- Pretty print metadata for a single experiment by uuid
+select jsonb_pretty(metadata) from experiments where metadata->>'uuid' = '2020-02-10-i-HUVECS';
 ```
 
 # References
@@ -27,3 +36,5 @@ select metadata -> 'uuid' from experiments where to_tsvector('english', metadata
 [Forget SQL vs NoSQL - Get the Best of Both Worlds with JSON in PostgreSQL](https://arctype.com/blog/json-in-postgresql/)
 
 [How to avoid performance bottlenecks when using JSONB in PostgreSQL](https://www.metisdata.io/blog/how-to-avoid-performance-bottlenecks-when-using-jsonb-in-postgresql)
+
+[JSON in PostgreSQL: The Ultimate Guide](https://www.databasestar.com/postgresql-json/)

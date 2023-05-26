@@ -8,6 +8,9 @@ docker-run:
 	--volume $(PWD):/app \
 	$(USER)/search /bin/bash
 
+docker-compose-prune:
+	docker compose rm --stop --volumes
+
 build:
 	docker-compose build
 
