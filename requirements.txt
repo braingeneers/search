@@ -1,3 +1,5 @@
+python-dotenv
+
 jupyter
 ipython
 
@@ -9,3 +11,8 @@ matplotlib
 
 psycopg2
 sqlalchemy
+
+langchain
+
+python-environ
+openai
