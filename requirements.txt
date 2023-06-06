@@ -1,0 +1,11 @@
+jupyter
+ipython
+
+requests
+boto3
+
+pandas
+matplotlib
+
+psycopg2
+sqlalchemy

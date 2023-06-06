@@ -1,15 +1,14 @@
 # Braingeneers Search
 Prototype experiment metadata search engine
 
-Recursively walks experiments in S3 storing any json found in a postgres database for structured and free form search.
-
-# Develop
-[Rust](https://www.rust-lang.org/tools/install)
+Indexes all metadata.json found in the AWS inventory into a postgres database
 
 # Running
 NOTE: Not ready for running off the shelf, but can get some running via:
 ```
 docker-compose -f .devcontainer/docker-compose.yml
+...
+python index.py
 ```
 
 # Sample SQl Queries
