@@ -1,5 +1,8 @@
 up:
-	docker compose up --build --force-recreate
+	docker compose up --detach --build --force-recreate
+
+down:
+	docker compose down
 
 shell:
 	docker compose exec \

@@ -1,22 +1,15 @@
-python-dotenv
-
-jupyter
-ipython
-
-black
-
-requests
 boto3
 
 pandas
 matplotlib
 
 psycopg2
-sqlalchemy
+flask
+flask-cors
 
-# langchain
+braingeneerspy [all] @ git+https://github.com/braingeneers/braingeneerspy.git
 
-# python-environ
-# openai
+jupyter
+ipython
 
-# braingeneerspy [all] @ git+https://github.com/braingeneers/braingeneerspy.git
+black
