@@ -1,7 +1,7 @@
 import os
 from urllib.parse import urlparse
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from flask_cors import CORS
 
 import psycopg2
@@ -25,6 +25,10 @@ try:
 
     # GET: Fetch all uuid's from the database
     @app.route("/")
+    def index():
+        return render_template("index.html")
+
+    @app.route("/uuids")
     def fetch_all_uuids():
         cur.execute("select metadata->'uuid' from experiments limit 5;")
         rows = cur.fetchall()

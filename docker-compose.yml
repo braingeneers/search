@@ -16,9 +16,11 @@ services:
       - .env
     volumes:
       - .:/home/app/code:cached
+    ports:
+      - "127.0.0.1:5000:5000"
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
-    network_mode: service:postgres
+    # network_mode: service:postgres
     # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
