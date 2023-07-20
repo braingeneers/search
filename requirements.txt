@@ -3,6 +3,8 @@ python-dotenv
 jupyter
 ipython
 
+black
+
 requests
 boto3
 
@@ -12,7 +14,9 @@ matplotlib
 psycopg2
 sqlalchemy
 
-langchain
+# langchain
 
-python-environ
-openai
+# python-environ
+# openai
+
+# braingeneerspy [all] @ git+https://github.com/braingeneers/braingeneerspy.git

@@ -1,24 +1,10 @@
-docker-build:
-	docker build -t $(USER)/search .
-
-docker-run:
-	docker run -it --rm \
-	--user $(id -u):$(id -g) \
-	--workdir /app \
-	--volume $(PWD):/app \
-	$(USER)/search /bin/bash
-
-docker-compose-prune:
-	docker compose rm --stop --volumes
-
-build:
-	docker-compose build
-
 up:
-	docker-compose -p $(USER) up --force-recreate
+	docker compose up --build --force-recreate
 
-down:
-	docker-compose -p $(USER) down --volumes
+shell:
+	docker compose exec \
+		--user app --workdir /home/app/code \
+		app /bin/bash
 
 list-bucket:
 	aws --endpoint https://s3-west.nrp-nautilus.io s3 ls --no-verify-ssl s3://braingeneers

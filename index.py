@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# /usr/bin/env python
 """
 Index any .json files found in the latest braingeneers aws inventory file by storing them as a jsonb column in a postgres table.
 
@@ -28,7 +28,7 @@ if __name__ == '__main__':
                         help="S3 inventory path prefix")
     args = parser.parse_args()
 
-    session = boto3.Session(profile_name=args.profile)
+    session = boto3.Session()
     s3 = session.client(
         service_name="s3",
         endpoint_url="https://s3-west.nrp-nautilus.io",
@@ -48,7 +48,7 @@ if __name__ == '__main__':
                      names=["bucket", "key", "version", "latest", "?",
                             "size", "created", "etag", "class", "??", "???", "encryption"],
                      parse_dates=["created"])
-    print(f"Found {df.shape[0]:,} json files in the inventory")
+    print(f"Found {df.shape[0]:,} files in the inventory")
 
     # Find all json files
     df = df.loc[df["key"].str.endswith(".json")]
