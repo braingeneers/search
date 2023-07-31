@@ -28,9 +28,13 @@ try:
     def index():
         return render_template("index.html")
 
+    @app.route("/ping")
+    def ping():
+        return "pong"
+
     @app.route("/uuids")
     def fetch_all_uuids():
-        cur.execute("select metadata->'uuid' from experiments limit 5;")
+        cur.execute("select metadata->'uuid' from experiments;")
         rows = cur.fetchall()
         print(rows)
         return jsonify(rows)

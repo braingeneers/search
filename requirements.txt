@@ -8,9 +8,9 @@ psycopg2
 flask
 flask-cors
 
-braingeneerspy [all] @ git+https://github.com/braingeneers/braingeneerspy.git
+# braingeneerspy [all] @ git+https://github.com/braingeneers/braingeneerspy.git
 
-jupyter
+# jupyter
 ipython
 
 black

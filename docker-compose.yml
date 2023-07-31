@@ -12,18 +12,28 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      - VIRTUAL_HOST=search.braingeneers.gi.ucsc.edu
+      - VIRTUAL_PORT=5000
+      - LETSENCRYPT_HOST=search.braingeneers.gi.ucsc.edu
+      - LETSENCRYPT_EMAIL=braingeners-admins-group@ucsc.edu
     env_file:
-      - .env
+      - postgres.env
     volumes:
       - .:/home/app/code:cached
       - ${HOME}/.aws:/home/app/.aws:cached
     ports:
       - "127.0.0.1:5000:5000"
-    # Overrides default command so things don't shut down after the process ends.
-    command: sleep infinity
-    # network_mode: service:postgres
-    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
-    # (Adding the "ports" property to this file will not forward from a Codespace.)
+    # command: sleep infinity
+    command:
+      - /bin/bash
+      - -c
+      - |
+        psql $$DATABASE_URL -f code/create.sql
+        flask --app code/server.py --debug run --host 0.0.0.0
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   postgres:
     container_name: postgres
@@ -32,6 +42,9 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data
     env_file:
-      - .env
-    # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
-    # (Adding the "ports" property to this file will not forward from a Codespace.)
+      - postgres.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
