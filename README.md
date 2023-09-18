@@ -6,7 +6,11 @@ Indexes all metadata.json found in the AWS inventory into a postgres database
 # Running
 NOTE: Not ready for running off the shelf, but can get some running via:
 ```
-docker-compose -f .devcontainer/docker-compose.yml
+make build
+make up
+make shell
+psql $DATABASE_URL < create.sql
+
 ...
 python index.py
 ```

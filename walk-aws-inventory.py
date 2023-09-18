@@ -18,13 +18,13 @@ from urllib.parse import urlparse
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Index json files from the latest aws inventory file"
-    )
-    parser.add_argument("--bucket", default="braingeneers", help="S3 bucket")
-    parser.add_argument(
-        "--profile", default="prp-braingeneers", help="S3 credentials profile name"
-    )
+parser = argparse.ArgumentParser(
+    description="Index json files from the latest aws inventory file"
+)
+parser.add_argument("--bucket", default="braingeneers", help="S3 bucket")
+parser.add_argument(
+    "--profile", default="prp-braingeneers", help="S3 credentials profile name"
+)
     parser.add_argument(
         "--prefix",
         default="services/data-lifecycle/aws-inventory/",

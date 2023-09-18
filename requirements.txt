@@ -1,6 +1,8 @@
 boto3
 awscli
 
+tqdm
+
 pandas
 matplotlib
 
@@ -8,9 +10,10 @@ psycopg2
 flask
 flask-cors
 
-# braingeneerspy [all] @ git+https://github.com/braingeneers/braingeneerspy.git
+pynwb
+braingeneerspy [all] @ git+https://github.com/braingeneers/braingeneerspy.git
 
-# jupyter
+jupyter
 ipython
 
 black
