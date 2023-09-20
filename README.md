@@ -9,11 +9,12 @@ NOTE: Not ready for running off the shelf, but can get some running via:
 make build
 make up
 make shell
-psql $DATABASE_URL < create.sql
 
 ...
-python index.py
+python update-index.py
 ```
+
+docker-compose.yml is configured to be run from the braingeneers server so that it integrates into the mission control reverse proxy exposing this as search.braingeneers.gi.ucsc.edu
 
 # Sample SQl Queries
 ```sql
