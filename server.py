@@ -13,10 +13,11 @@ CORS(app)
 
 try:
     p = urlparse(os.environ.get("DATABASE_URL"))
+    print(p)
     con = psycopg2.connect(
-        host=p.scheme,
+        host=p.hostname,
         port=p.port,
-        database=p.hostname,
+        database=p.path.split("/")[-1],
         user=p.username,
         password=p.password,
     )
@@ -32,6 +33,10 @@ try:
     def ping():
         return "pong"
 
+    @app.route("/version")
+    def version():
+        return "0.0.5"
+
     @app.route("/uuids")
     def fetch_all_uuids():
         cur.execute("select metadata->'uuid' from experiments;")
@@ -40,4 +45,4 @@ try:
         return jsonify(rows)
 
 except:
-    print("Error")
+    print("Error starting search application")

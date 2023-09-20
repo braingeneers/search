@@ -180,7 +180,7 @@ if __name__ == "__main__":
         print(f"Sampling {args.count} uuids from {len(uuids)}")
         uuids = random.sample(uuids, args.count)
 
-    print("Reading metadata:")
+    print("Searching for experiments with metadata.json:")
 
     # NOTE: A few experiments have manifest.json instead of metadata.json, ignoring
     info = [
@@ -194,7 +194,7 @@ if __name__ == "__main__":
 
     df = pd.DataFrame(info, columns=["type", "uuid", "metadata"])
     df = df[df.metadata == True]
-    print(f"Of these found metadata.json for {df.shape[0]}")
+    print(f"Found {df.shape[0]} with metadata.json")
     print(
         f"Duplicate uuids: {df[df.duplicated(subset='uuid', keep=False)].uuid.values}"
     )
@@ -202,9 +202,9 @@ if __name__ == "__main__":
     print("Indexing metadata.json into the database...")
     p = urlparse(os.environ.get("DATABASE_URL"))
     with psycopg2.connect(
-        host=p.scheme,
+        host=p.hostname,
         port=p.port,
-        database=p.hostname,
+        database=p.path.split("/")[-1],
         user=p.username,
         password=p.password,
     ) as con:
@@ -215,9 +215,9 @@ if __name__ == "__main__":
                 """
             )
 
-        for i, row in df.iterrows():
+        for i, row in (progress := tqdm(df.iterrows())):
             path = f"{row.type}/{row.uuid}/metadata.json"
-            print(f"Indexing {path}")
+            progress.set_description(path)
 
             res = s3.get_object(Bucket=args.bucket, Key=path)
             content = res.get("Body").read()

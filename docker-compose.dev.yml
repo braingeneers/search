@@ -27,10 +27,10 @@ services:
     volumes:
       - ${HOME}/.aws:/home/app/.aws:cached
       # DEV ONLY: Mount local code when developig only
-      # - .:/home/app/code:cached
-      # ports:
+      - .:/home/app/code:cached
+    ports:
       # DEV ONLY: Forward to local machine for tunnel to browser
-      # - "127.0.0.1:5000:5000"
+      - "127.0.0.1:5000:5000"
     expose:
       - 5000
     command:
@@ -38,9 +38,9 @@ services:
       - -c
       - |
         psql $$DATABASE_URL -f code/create.sql
-        flask --app code/server.py run --host 0.0.0.0
+        # flask --app code/server.py run --host 0.0.0.0
         # DEV ONLY: Auto reload when code changes
-        # flask --app code/server.py --debug run --host 0.0.0.0
+        flask --app code/server.py --debug run --host 0.0.0.0
     depends_on:
       search-db:
         condition: service_healthy

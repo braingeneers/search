@@ -3,21 +3,27 @@ build:
 
 up:
 	docker compose up --detach --force-recreate
+	# docker compose up
+
+follow:
+	docker compose logs --follow
 
 debug:
-	docker compose up --build --force-recreate
+	docker compose --file docker-compose.dev.yml up --build --force-recreate
+	# docker compose up --build --force-recreate
 
 down:
 	docker compose down
 
 clean:
 	docker compose rm -f -s -v
-	docker volume rm $(USER)-braingeneers-search_postgres
+	docker volume rm mission_control_search-db
+	docker network rm mission_control_braingeneers-net
 
 shell:
 	docker compose exec \
 		--user app --workdir /home/app/code \
-		app /bin/bash
+		search /bin/bash
 
 serve:
 	flask --app server.py --debug run --host 0.0.0.0 
