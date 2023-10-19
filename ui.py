@@ -8,19 +8,14 @@ conn = st.experimental_connection(
 
 st.title("Braingeneers Search")
 
-# Show all uuids
-# df = conn.query("select metadata->'uuid' as uuid from experiments;", ttl="0")
-# Print results.
-# for row in df.itertuples():
-#     st.write(f"{row.uuid}")
-
-query = st.text_input("")
+query = st.text_input("Query:", label_visibility="collapsed")
 
 if query:
     df = conn.query(
-        f"select metadata->'uuid' as uuid from experiments where to_tsvector('english', metadata) @@ to_tsquery('{query}:*')",
+        f"select metadata->'uuid' as uuid, metadata from experiments where to_tsvector('english', metadata) @@ to_tsquery('{query}:*')",
         ttl="0",
     )
 
     for row in df.itertuples():
         st.write(f"{row.uuid}")
+        st.json(row.metadata, expanded=False)
