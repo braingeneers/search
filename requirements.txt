@@ -7,8 +7,12 @@ pandas
 matplotlib
 
 psycopg2
+SQLAlchemy
+
 flask
 flask-cors
+
+streamlit
 
 pynwb
 braingeneerspy [all] @ git+https://github.com/braingeneers/braingeneerspy.git
@@ -17,3 +21,5 @@ jupyter
 ipython
 
 black
+
+# vaex

@@ -3,14 +3,13 @@ build:
 
 up:
 	docker compose up --detach --force-recreate
-	# docker compose up
 
 follow:
 	docker compose logs --follow
 
 debug:
-	docker compose --file docker-compose.dev.yml up --build --force-recreate
-	# docker compose up --build --force-recreate
+	# docker compose --file docker-compose.dev.yml up --build --force-recreate
+	docker compose --file docker-compose.dev.yml up --force-recreate
 
 down:
 	docker compose down
@@ -25,8 +24,24 @@ shell:
 		--user app --workdir /home/app/code \
 		search /bin/bash
 
+ipython-shell:
+	docker compose exec \
+		--user app --workdir /home/app/code \
+		search python -m IPython --no-autoindent
+
 serve:
 	flask --app server.py --debug run --host 0.0.0.0 
+
+streamlit:
+	streamlit run ui.py --server.port 8888
+
+jupyter:
+	# Use URL that it prints to connect to from vscode via select kernel
+	jupyter notebook --port=8888 --no-browser --ip=0.0.0.0 --allow-root
+
+# Connect to existing notebook kernel to inspect via command line
+jupyter-console:
+	jupyter console --existing
 
 list-bucket:
 	aws --endpoint https://s3-west.nrp-nautilus.io s3 ls --no-verify-ssl s3://braingeneers
@@ -56,7 +71,3 @@ mqtt-cli:
 	mqttx conn -h 'braingeneers.gi.ucsc.edu' -p 1883
 	mqttx sub -t 'hello' -h 'braingeneers.gi.ucsc.edu' -p 1883
 	mqttx pub -t 'hello' -h 'braingeneers.gi.ucsc.edu' -p 1883 -m 'from MQTTX CLI'
-
-# Connect to existing notebook kernel to inspect via command line
-jupyter-console:
-	jupyter console --existing

@@ -42,3 +42,5 @@ select jsonb_pretty(metadata) from experiments where metadata->>'uuid' = '2020-0
 [How to avoid performance bottlenecks when using JSONB in PostgreSQL](https://www.metisdata.io/blog/how-to-avoid-performance-bottlenecks-when-using-jsonb-in-postgresql)
 
 [JSON in PostgreSQL: The Ultimate Guide](https://www.databasestar.com/postgresql-json/)
+
+[Allen Institute Steamlit Interface](https://github.com/nlsschim/allen_institute_connection)

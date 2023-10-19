@@ -23,7 +23,7 @@ services:
       - LETSENCRYPT_HOST=search.braingeneers.gi.ucsc.edu
       - LETSENCRYPT_EMAIL=braingeners-admins-group@ucsc.edu
     env_file:
-      - postgres.env
+      - search.env
     volumes:
       - ${HOME}/.aws:/home/app/.aws:cached
       # DEV ONLY: Mount local code when developig only
@@ -54,7 +54,7 @@ services:
     volumes:
       - search-db:/var/lib/postgresql/data
     env_file:
-      - postgres.env
+      - search.env
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s

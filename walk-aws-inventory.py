@@ -18,13 +18,17 @@ from urllib.parse import urlparse
 
 
 if __name__ == "__main__":
-parser = argparse.ArgumentParser(
-    description="Index json files from the latest aws inventory file"
-)
-parser.add_argument("--bucket", default="braingeneers", help="S3 bucket")
-parser.add_argument(
-    "--profile", default="prp-braingeneers", help="S3 credentials profile name"
-)
+    parser = argparse.ArgumentParser(
+        description="Index json files from the latest aws inventory file"
+    )
+    parser.add_argument(
+        "--bucket", default=os.getenv("S3_BUCKET", "braingeneers"), help="S3 bucket"
+    )
+    parser.add_argument(
+        "--profile",
+        default=os.getenv("S3_PROFILE", "prp-braingeneers"),
+        help="S3 credentials profile name",
+    )
     parser.add_argument(
         "--prefix",
         default="services/data-lifecycle/aws-inventory/",
@@ -32,10 +36,10 @@ parser.add_argument(
     )
     args = parser.parse_args()
 
-    session = boto3.Session(profile_name="prp-braingeneers")
+    session = boto3.Session(profile_name=args.profile)
     s3 = session.client(
         service_name="s3",
-        endpoint_url="https://s3-west.nrp-nautilus.io",
+        endpoint_url=os.getenv("S3_ENDPOINT", "https://s3.braingeneers.gi.ucsc.edu"),
     )
 
     # Download the latest S3 inventory file

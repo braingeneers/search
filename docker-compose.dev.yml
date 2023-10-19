@@ -23,16 +23,18 @@ services:
       - LETSENCRYPT_HOST=search.braingeneers.gi.ucsc.edu
       - LETSENCRYPT_EMAIL=braingeners-admins-group@ucsc.edu
     env_file:
-      - postgres.env
+      - search.env
     volumes:
       - ${HOME}/.aws:/home/app/.aws:cached
-      # DEV ONLY: Mount local code when developig only
+      # DEV ONLY: Mount local code when developing only
       - .:/home/app/code:cached
     ports:
       # DEV ONLY: Forward to local machine for tunnel to browser
       - "127.0.0.1:5000:5000"
+      - "127.0.0.1:8888:8888"
     expose:
       - 5000
+      - 8888
     command:
       - /bin/bash
       - -c
@@ -54,7 +56,7 @@ services:
     volumes:
       - search-db:/var/lib/postgresql/data
     env_file:
-      - postgres.env
+      - search.env
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
