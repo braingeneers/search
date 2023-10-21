@@ -33,7 +33,18 @@ serve:
 	flask --app server.py --debug run --host 0.0.0.0 
 
 streamlit:
-	streamlit run ui.py --server.port 8888
+	streamlit run ui.py \
+		--server.port 8888 \
+		--browser.gatherUsageStats=False \
+		--client.toolbarMode="auto" \
+		--logger.level="info"
+
+# streamlit-debug:
+# 	streamlit run ui.py \
+# 		--server.port 8888 \
+# 		--browser.gatherUsageStats=True \
+# 		--client.toolbarMode="auto" \
+# 		--logger.level="warning"
 
 jupyter:
 	# Use URL that it prints to connect to from vscode via select kernel

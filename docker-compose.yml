@@ -38,7 +38,8 @@ services:
       - -c
       - |
         psql $$DATABASE_URL -f code/create.sql
-        flask --app code/server.py run --host 0.0.0.0
+        cd code && streamlit run ui.py --server.port 5000
+        # flask --app code/server.py run --host 0.0.0.0
         # DEV ONLY: Auto reload when code changes
         # flask --app code/server.py --debug run --host 0.0.0.0
     depends_on:

@@ -31,7 +31,6 @@ services:
     ports:
       # DEV ONLY: Forward to local machine for tunnel to browser
       - "127.0.0.1:5000:5000"
-      - "127.0.0.1:8888:8888"
     expose:
       - 5000
       - 8888
@@ -40,9 +39,10 @@ services:
       - -c
       - |
         psql $$DATABASE_URL -f code/create.sql
+        cd code && streamlit run ui.py --server.port 5000
         # flask --app code/server.py run --host 0.0.0.0
         # DEV ONLY: Auto reload when code changes
-        flask --app code/server.py --debug run --host 0.0.0.0
+        # flask --app code/server.py --debug run --host 0.0.0.0
     depends_on:
       search-db:
         condition: service_healthy

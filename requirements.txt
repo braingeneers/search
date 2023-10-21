@@ -9,17 +9,16 @@ matplotlib
 psycopg2
 SQLAlchemy
 
-flask
-flask-cors
+# flask
+# flask-cors
 
 streamlit
 
-pynwb
-braingeneerspy [all] @ git+https://github.com/braingeneers/braingeneerspy.git
+# pynwb
+# braingeneerspy [all] @ git+https://github.com/braingeneers/braingeneerspy.git
+# vaex
 
-jupyter
-ipython
+# jupyter
+# ipython
 
 black
-
-# vaex

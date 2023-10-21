@@ -20,4 +20,6 @@ WORKDIR /home/${USERNAME}
 
 COPY . code
 
-CMD ["flask", "--app", "code/server.py", "run", "--host", "0.0.0.0"] 
+# CMD ["flask", "--app", "code/server.py", "run", "--host", "0.0.0.0"] 
+
+CMD ["streamlit", "--server.address", "0.0.0.0", "--server.port", "5000"] 
