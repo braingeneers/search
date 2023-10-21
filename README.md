@@ -1,17 +1,17 @@
 # Braingeneers Search
-Prototype experiment metadata search engine
-
-Indexes all metadata.json found in the AWS inventory into a postgres database
+Crawls the braingeneers prp bucket indexing any found metadata.json in a database and exploring a web search front end at [search.braingeneers.gi.ucsc.edu](search.braingeneers.gi.ucsc.edu)
 
 # Running
 NOTE: Not ready for running off the shelf, but can get some running via:
 ```
 make build
+make debug
+or
 make up
-make shell
-
+make follow
 ...
-python update-index.py
+make shell
+python crawl.py
 ```
 
 docker-compose.yml is configured to be run from the braingeneers server so that it integrates into the mission control reverse proxy exposing this as search.braingeneers.gi.ucsc.edu
