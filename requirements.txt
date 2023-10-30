@@ -15,10 +15,10 @@ SQLAlchemy
 streamlit
 
 # pynwb
-# braingeneerspy [all] @ git+https://github.com/braingeneers/braingeneerspy.git
+# braingeneers[all] @ git+https://github.com/braingeneers/braingeneerspy.git
 # vaex
 
-# jupyter
-# ipython
+jupyter
+ipython
 
 black

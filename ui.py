@@ -4,9 +4,7 @@ import streamlit as st
 
 st.set_page_config(page_title="Braingeneers Search", page_icon="🧠", layout="wide")
 
-conn = st.experimental_connection(
-    name="search", type="sql", url=os.environ["DATABASE_URL"]
-)
+conn = st.connection(name="search", type="sql", url=os.environ["DATABASE_URL"])
 
 
 def handle_click(uuid):
@@ -28,13 +26,14 @@ with st.sidebar:
 
     query = st.text_input("Query:", label_visibility="collapsed")
 
-    st.write("Experiments found:")
     if query:
+        st.write("Experiments found:")
         df = conn.query(
             f"select metadata->'uuid' as uuid from experiments where to_tsvector('english', metadata) @@ to_tsquery('{query}:*')",
             ttl="0",
         )
     else:
+        st.write("All experiments:")
         df = conn.query(
             "select metadata->'uuid' as uuid from experiments",
             ttl="0",
