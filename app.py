@@ -26,7 +26,7 @@ with st.sidebar:
     if query:
         st.write("Experiments found:")
         for row in conn.execute(
-            f"SELECT rowid, snippet(experiments,2, '<b>', '</b>','...',8) FROM experiments('{query}*');"
+            f"SELECT rowid, snippet(experiments,2, ':blue[', ']', '...',8) FROM experiments('{query}*');"
         ):
             st.button(
                 f"{row[1]}",
