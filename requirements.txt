@@ -9,10 +9,13 @@ matplotlib
 psycopg2
 SQLAlchemy
 
+apsw
+
 # flask
 # flask-cors
 
 streamlit
+watchdog
 
 # pynwb
 # braingeneers[all] @ git+https://github.com/braingeneers/braingeneerspy.git

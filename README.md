@@ -35,6 +35,9 @@ select jsonb_pretty(metadata) from experiments where metadata->>'uuid' = '2020-0
 ```
 
 # References
+[Postgres Full Text Search vs the rest](https://supabase.com/blog/postgres-full-text-search-vs-the-rest)
+
+
 [Postgres GIN Index](https://www.postgresql.org/docs/15/gin-intro.html)
 
 [Forget SQL vs NoSQL - Get the Best of Both Worlds with JSON in PostgreSQL](https://arctype.com/blog/json-in-postgresql/)

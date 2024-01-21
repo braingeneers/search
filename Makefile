@@ -29,6 +29,21 @@ ipython-shell:
 		--user app --workdir /home/app/code \
 		search python -m IPython --no-autoindent
 
+pg-init:
+	pg_ctl -D data/pg init
+
+pg-up:
+	pg_ctl -D data/pg start
+
+pg-run:
+	postgres -D data/pg
+
+pg-down:
+	pg_ctl -D data/pg stop
+
+sqlite-console:
+	$$(brew --prefix)/opt/sqlite/bin/sqlite3 data/braingeneers.db
+
 serve:
 	flask --app server.py --debug run --host 0.0.0.0 
 
