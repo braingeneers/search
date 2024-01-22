@@ -19,48 +19,27 @@ services:
       dockerfile: Dockerfile
     environment:
       - VIRTUAL_HOST=search.braingeneers.gi.ucsc.edu
-      - VIRTUAL_PORT=5000
+      - VIRTUAL_PORT=8501
       - LETSENCRYPT_HOST=search.braingeneers.gi.ucsc.edu
       - LETSENCRYPT_EMAIL=braingeners-admins-group@ucsc.edu
-    env_file:
-      - search.env
+      - S3_ENDPOINT=https://s3.braingeneers.gi.ucsc.edu
+      - S3_PROFILE=prp-braingeneers
+      - S3_BUCKET=braingeneers
     volumes:
-      - ${HOME}/.aws:/home/app/.aws:cached
       # DEV ONLY: Mount local code when developing only
-      - .:/home/app/code:cached
+      # - .:/home/app/code:cached
+      - ${HOME}/.aws:/root/.aws:cached
+      - search-db:/root/data
     ports:
       # DEV ONLY: Forward to local machine for tunnel to browser
-      - "127.0.0.1:5000:5000"
+      - "127.0.0.1:8501:8501"
     expose:
-      - 5000
-      - 8888
+      - 8501
     command:
       - /bin/bash
       - -c
       - |
-        psql $$DATABASE_URL -f code/create.sql
-        cd code && streamlit run ui.py --server.port 5000
-        # flask --app code/server.py run --host 0.0.0.0
-        # DEV ONLY: Auto reload when code changes
-        # flask --app code/server.py --debug run --host 0.0.0.0
-    depends_on:
-      search-db:
-        condition: service_healthy
-    networks:
-      - braingeneers-net
-
-  search-db:
-    container_name: search-db
-    image: postgres:15.3-bullseye
-    restart: unless-stopped
-    volumes:
-      - search-db:/var/lib/postgresql/data
-    env_file:
-      - search.env
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+        sqlite3 -init create.sql data/braingeneers.db .quit
+        streamlit run app.py
     networks:
       - braingeneers-net

@@ -1,6 +1,6 @@
 # /usr/bin/env python
 """
-Crawl the braingeneers prp top level experiment types (ephys, imaging etc...) and update the metadata index in postgres. 
+Crawl the braingeneers prp top level experiment types (ephys, imaging etc...) and update the metadata index in sqlite. 
 """
 import os
 import random
@@ -10,8 +10,7 @@ from operator import attrgetter
 
 from tqdm import tqdm
 
-import psycopg2
-from urllib.parse import urlparse
+import apsw
 
 import boto3
 import pandas as pd
@@ -154,21 +153,25 @@ if __name__ == "__main__":
         description="Crawl the braingneers prp top level experiment types"
     )
     parser.add_argument(
-        "--bucket", default=os.getenv("S3_BUCKET", "braingeneers"),
-        help="S3 bucket")
-    parser.add_argument(
-        "--profile", default=os.getenv("S3_PROFILE", "prp-braingeneers"), 
-        help="S3 credentials profile name"
+        "--endpoint", 
+        default=os.getenv("S3_ENDPOINT", "https://s3.braingeneers.gi.ucsc.edu"),
+        help="S3 endpoint",
     )
     parser.add_argument(
-        "-c", "--count", type=int, default=None, 
-        help="Count to index")
+        "--profile",
+        default=os.getenv("S3_PROFILE", "prp-braingeneers"),
+        help="S3 credentials profile name",
+    )
+    parser.add_argument(
+        "--bucket", default=os.getenv("S3_BUCKET", "braingeneers"), help="S3 bucket"
+    )
+    parser.add_argument("-c", "--count", type=int, default=None, help="Count to index")
     args = parser.parse_args()
 
     session = boto3.Session(profile_name=args.profile)
     s3 = session.client(
         service_name="s3",
-        endpoint_url=os.getenv("S3_ENDPOINT", "https://s3.braingeneers.gi.ucsc.edu")
+        endpoint_url=args.endpoint,
     )
 
     modalities = ["archive", "ephys", "fluidics", "imaging", "integrated"]
@@ -205,36 +208,33 @@ if __name__ == "__main__":
     )
 
     print("Indexing metadata.json into the database...")
-    p = urlparse(os.environ.get("DATABASE_URL"))
-    with psycopg2.connect(
-        host=p.hostname,
-        port=p.port,
-        database=p.path.split("/")[-1],
-        user=p.username,
-        password=p.password,
-    ) as con:
-        with con.cursor() as cur:
-            cur.execute(
-                """
-                DELETE FROM experiments;
-                """
-            )
 
-        for i, row in (progress := tqdm(df.iterrows())):
-            path = f"{row.type}/{row.uuid}/metadata.json"
-            progress.set_description(path)
+    conn = apsw.Connection("data/braingeneers.db")
+    # conn.execute(
+    #     """
+    #     DROP TABLE experiments;
+    # """
+    # )
+    # conn.execute(
+    #     """
+    #     CREATE VIRTUAL TABLE IF NOT EXISTS experiments 
+    #     USING fts5(uuid, path, metadata);
+    # """
+    # )
 
-            res = s3.get_object(Bucket=args.bucket, Key=path)
-            content = res.get("Body").read()
+    for i, row in (progress := tqdm(df.iterrows())):
+        path = f"{row.type}/{row.uuid}/metadata.json"
+        print(f"Indexing {path}")
+        progress.set_description(path)
 
-            with con.cursor() as cur:
-                cur.execute(
-                    """
-                    INSERT INTO experiments (key, metadata) VALUES (%s, %s);
-                    """,
-                    (path, content.decode("utf-8")),
-                )
+        res = s3.get_object(Bucket=args.bucket, Key=path)
+        content = res.get("Body").read()
 
-            con.commit()
+        conn.execute(
+            """
+                INSERT INTO experiments (uuid, path, metadata) VALUES (?, ?, ?);
+                """,
+            (row.uuid, path, content.decode("utf-8")),
+        )
 
-        print("Done.")
+    print("Done.")
