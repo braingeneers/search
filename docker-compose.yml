@@ -30,7 +30,7 @@ services:
       # - .:/home/app/code:cached
       - ${HOME}/.aws:/root/.aws:cached
       - search-db:/root/data
-    ports:
+      # ports:
       # DEV ONLY: Forward to local machine for tunnel to browser
       # - "127.0.0.1:8501:8501"
     expose:

@@ -26,10 +26,10 @@ with st.sidebar:
     if query:
         st.write("Experiments found:")
         for row in conn.execute(
-            f"SELECT rowid, snippet(experiments,2, ':blue[', ']', '...',8) FROM experiments('{query}*');"
+            f"SELECT rowid, uuid, snippet(experiments,2, ':green[', ']', '...',8) FROM experiments('{query}*');"
         ):
             st.button(
-                f"{row[1]}",
+                f":blue[{row[1]}]\n\n{row[2]}",
                 key=row[0],
                 args=(row[0],),
                 on_click=handle_click,
