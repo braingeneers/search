@@ -4,15 +4,8 @@ awscli
 tqdm
 
 pandas
-matplotlib
-
-psycopg2
-SQLAlchemy
 
 apsw
-
-# flask
-# flask-cors
 
 streamlit
 watchdog
@@ -21,7 +14,5 @@ watchdog
 # braingeneers[all] @ git+https://github.com/braingeneers/braingeneerspy.git
 # vaex
 
-jupyter
 ipython
-
 black

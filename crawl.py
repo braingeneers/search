@@ -153,7 +153,7 @@ if __name__ == "__main__":
         description="Crawl the braingneers prp top level experiment types"
     )
     parser.add_argument(
-        "--endpoint", 
+        "--endpoint",
         default=os.getenv("S3_ENDPOINT", "https://s3.braingeneers.gi.ucsc.edu"),
         help="S3 endpoint",
     )
@@ -210,17 +210,6 @@ if __name__ == "__main__":
     print("Indexing metadata.json into the database...")
 
     conn = apsw.Connection("data/braingeneers.db")
-    # conn.execute(
-    #     """
-    #     DROP TABLE experiments;
-    # """
-    # )
-    # conn.execute(
-    #     """
-    #     CREATE VIRTUAL TABLE IF NOT EXISTS experiments 
-    #     USING fts5(uuid, path, metadata);
-    # """
-    # )
 
     for i, row in (progress := tqdm(df.iterrows())):
         path = f"{row.type}/{row.uuid}/metadata.json"
@@ -229,12 +218,23 @@ if __name__ == "__main__":
 
         res = s3.get_object(Bucket=args.bucket, Key=path)
         content = res.get("Body").read()
+        last_modified = res.get("LastModified")
 
         conn.execute(
             """
-                INSERT INTO experiments (uuid, path, metadata) VALUES (?, ?, ?);
+                INSERT INTO experiments (uuid, path, last_modified, metadata) VALUES (?, ?, ?, ?);
                 """,
-            (row.uuid, path, content.decode("utf-8")),
+            (
+                row.uuid,
+                path,
+                last_modified.strftime("%Y-%m-%d"),
+                content.decode("utf-8"),
+            ),
         )
+
+    oldest = conn.execute("SELECT MIN(last_modified) FROM experiments;").fetchone()[0]
+    newest = conn.execute("SELECT MAX(last_modified) FROM experiments;").fetchone()[0]
+    print(f"Oldest: {oldest}")
+    print(f"Newest: {newest}")
 
     print("Done.")
