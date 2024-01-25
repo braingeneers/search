@@ -15,4 +15,5 @@ watchdog
 # vaex
 
 ipython
+pylint
 black

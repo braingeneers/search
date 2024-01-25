@@ -13,7 +13,6 @@ from tqdm import tqdm
 import apsw
 
 import boto3
-import pandas as pd
 
 S3Obj = namedtuple("S3Obj", ["key", "mtime", "size", "ETag"])
 
@@ -166,8 +165,27 @@ if __name__ == "__main__":
         "--bucket", default=os.getenv("S3_BUCKET", "braingeneers"), help="S3 bucket"
     )
     parser.add_argument("-c", "--count", type=int, default=None, help="Count to index")
+    parser.add_argument(
+        "-d", "--delete", action="store_true", help="Delete all existing entries"
+    )
     args = parser.parse_args()
 
+    conn = apsw.Connection("data/braingeneers.db")
+
+    if args.delete:
+        print("Deleting all existing entries and vacuuming database")
+        conn.execute("DELETE FROM experiments;")
+        conn.execute("VACUUM;")
+
+    # Get all paths that are already indexed in the database
+    existing_paths = conn.execute("SELECT path FROM experiments;").fetchall()
+    if existing_paths:
+        existing_paths = set(list(zip(*existing_paths))[0])
+    else:
+        existing_paths = set()
+    print(f"Found {len(existing_paths)} existing paths in the database")
+
+    # Crawl a list of all paths for each of the modalities
     session = boto3.Session(profile_name=args.profile)
     s3 = session.client(
         service_name="s3",
@@ -176,47 +194,36 @@ if __name__ == "__main__":
 
     modalities = ["archive", "ephys", "fluidics", "imaging", "integrated"]
 
-    print(f"Collecting uuids in {modalities}")
-    uuids = [
-        (t, p[0].split("/")[1])
-        for t in tqdm(modalities)
-        for p in s3list(client=s3, bucket=args.bucket, path=t, recursive=False)
-    ]
-    print(f"Found {len(uuids)} uuids")
-
-    if args.count:
-        print(f"Sampling {args.count} uuids from {len(uuids)}")
-        uuids = random.sample(uuids, args.count)
-
-    print("Searching for experiments with metadata.json:")
-
-    # NOTE: A few experiments have manifest.json instead of metadata.json, ignoring
-    info = [
-        (
-            *u,
-            key_exists(s3, args.bucket, f"{u[0]}/{u[1]}/metadata.json"),
-            # key_exists(s3, args.bucket, f"{u[0]}/{u[1]}/manifest.json"),
-        )
-        for u in tqdm(uuids)
-    ]
-
-    df = pd.DataFrame(info, columns=["type", "uuid", "metadata"])
-    df = df[df.metadata == True]
-    print(f"Found {df.shape[0]} with metadata.json")
-    print(
-        f"Duplicate uuids: {df[df.duplicated(subset='uuid', keep=False)].uuid.values}"
+    print(f"Listing all paths under {modalities}")
+    all_paths = set(
+        [
+            p[0].rstrip("/")
+            for t in tqdm(modalities)
+            for p in s3list(client=s3, bucket=args.bucket, path=t, recursive=False)
+        ]
     )
+    new_paths = all_paths - existing_paths
+    print(f"Found {len(all_paths)} paths of which {len(new_paths)} are new")
 
-    print("Indexing metadata.json into the database...")
+    # If count specified, sample from the new paths
+    if args.count:
+        print(f"Sampling {args.count} paths from {len(new_paths)} new paths")
+        new_paths = random.sample(list(new_paths), args.count)
 
-    conn = apsw.Connection("data/braingeneers.db")
+    print("Search new paths for metadata.json")
+    for path in (progress := tqdm(new_paths)):
+        key = f"{path}/metadata.json"
 
-    for i, row in (progress := tqdm(df.iterrows())):
-        path = f"{row.type}/{row.uuid}/metadata.json"
-        print(f"Indexing {path}")
+        # NOTE: A few experiments have manifest.json instead of metadata.json, ignoring
+        if not key_exists(s3, args.bucket, key):
+            print(f"Skipping {path} (no metadata.json)")
+            continue
+
+        print(f"Found metadata.json for {path}")
+
         progress.set_description(path)
 
-        res = s3.get_object(Bucket=args.bucket, Key=path)
+        res = s3.get_object(Bucket=args.bucket, Key=key)
         content = res.get("Body").read()
         last_modified = res.get("LastModified")
 
@@ -225,7 +232,7 @@ if __name__ == "__main__":
                 INSERT INTO experiments (uuid, path, last_modified, metadata) VALUES (?, ?, ?, ?);
                 """,
             (
-                row.uuid,
+                path.split("/")[1],
                 path,
                 last_modified.strftime("%Y-%m-%d"),
                 content.decode("utf-8"),

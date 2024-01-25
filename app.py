@@ -13,8 +13,8 @@ def handle_click(rowid):
         f"SELECT uuid, path, last_modified, metadata FROM experiments WHERE rowid = {rowid}"
     ).fetchone()
     st.title(row[0])
-    st.text(row[1])
-    st.text(f"Last modified: {row[2]}")
+    st.markdown(f"**Path:** {row[1]}")
+    st.markdown(f"**Last modified:** {row[2]}")
     st.json(row[3], expanded=True)
 
 
@@ -26,16 +26,17 @@ with st.sidebar:
     with right:
         st.title("Braingeneers Search")
 
-    oldest = conn.execute("SELECT MIN(last_modified) FROM experiments;").fetchone()[0]
-    newest = conn.execute("SELECT MAX(last_modified) FROM experiments;").fetchone()[0]
-    st.text(f"From {oldest} to {newest}")
+    # count = conn.execute("SELECT COUNT(*) FROM experiments;").fetchone()[0]
+    # oldest = conn.execute("SELECT MIN(last_modified) FROM experiments;").fetchone()[0]
+    # newest = conn.execute("SELECT MAX(last_modified) FROM experiments;").fetchone()[0]
+    # st.text(f"{count} experiments from {oldest} to {newest}")
 
     query = st.text_input("Query:", label_visibility="collapsed")
 
     if query:
         st.write("Experiments found:")
         for row in conn.execute(
-            f"SELECT rowid, uuid, last_modified, snippet(experiments,3, ':green[', ']', '...',8) FROM experiments('{query}*');"
+            f"SELECT rowid, uuid, last_modified, snippet(experiments,3, ':green[', ']', '...',8) FROM experiments('{query}*') ORDER BY last_modified DESC;"
         ):
             st.button(
                 f":blue[{row[1]}]\n\n{row[3]}",
@@ -45,7 +46,9 @@ with st.sidebar:
             )
     else:
         st.write("All experiments:")
-        for row in conn.execute("select rowid, uuid from experiments"):
+        for row in conn.execute(
+            "select rowid, uuid from experiments ORDER BY last_modified DESC"
+        ):
             st.button(
                 f"{row[1]}",
                 key=row[0],
