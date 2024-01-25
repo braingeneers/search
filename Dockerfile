@@ -14,6 +14,6 @@ WORKDIR /root
 
 COPY . .
 
-RUN echo "* */12 * * * root /usr/local/bin/python crawl.py -c 5 > /proc/1/fd/1 2>/proc/1/fd/2" > /etc/crontab
+RUN echo "* */12 * * * root /usr/local/bin/python crawl.py > /proc/1/fd/1 2>/proc/1/fd/2" > /etc/crontab
 
 CMD ["streamlit"]
