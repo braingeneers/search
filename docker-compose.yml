@@ -40,6 +40,7 @@ services:
       - -c
       - |
         sqlite3 -init create.sql data/braingeneers.db .quit
+        cron
         streamlit run app.py
     networks:
       - braingeneers-net

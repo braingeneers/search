@@ -8,7 +8,7 @@ follow:
 	docker compose logs --follow
 
 debug:
-	docker compose --file docker-compose.yml up --force-recreate
+	docker compose --file docker-compose.dev.yml up --force-recreate
 
 down:
 	docker compose down

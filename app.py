@@ -26,10 +26,10 @@ with st.sidebar:
     with right:
         st.title("Braingeneers Search")
 
-    # count = conn.execute("SELECT COUNT(*) FROM experiments;").fetchone()[0]
-    # oldest = conn.execute("SELECT MIN(last_modified) FROM experiments;").fetchone()[0]
-    # newest = conn.execute("SELECT MAX(last_modified) FROM experiments;").fetchone()[0]
-    # st.text(f"{count} experiments from {oldest} to {newest}")
+    count = conn.execute("SELECT COUNT(*) FROM experiments;").fetchone()[0]
+    oldest = conn.execute("SELECT MIN(last_modified) FROM experiments;").fetchone()[0]
+    newest = conn.execute("SELECT MAX(last_modified) FROM experiments;").fetchone()[0]
+    st.text(f"{count} total experiments\nfrom {oldest} to {newest}")
 
     query = st.text_input("Query:", label_visibility="collapsed")
 

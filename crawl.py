@@ -216,10 +216,7 @@ if __name__ == "__main__":
 
         # NOTE: A few experiments have manifest.json instead of metadata.json, ignoring
         if not key_exists(s3, args.bucket, key):
-            print(f"Skipping {path} (no metadata.json)")
             continue
-
-        print(f"Found metadata.json for {path}")
 
         progress.set_description(path)
 
