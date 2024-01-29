@@ -43,3 +43,16 @@ list-bucket:
 list-experiment:
 	aws --endpoint https://s3-west.nrp-nautilus.io --profile prp-braingeneers \
 		s3 ls s3://braingeneers/ephys/2022-04-24-e-connectoids-chip11350/
+
+mqtt-local:
+	docker run --init -it --rm --name mqtt \
+	--mount type=bind,source="$(pwd)"/emqx.conf,target=/opt/emqx/etc/emqx.conf \
+	--mount type=bind,source="$(pwd)"/emqx.conf,target=/opt/emqx/etc/emqx.conf \
+	emqx/emqx:5.1.0
+
+mqtt-cli:
+	docker run -it --rm emqx/mqttx-cli
+
+	mqttx conn -h 'braingeneers.gi.ucsc.edu' -p 1883
+	mqttx sub -t 'hello' -h 'braingeneers.gi.ucsc.edu' -p 1883
+	mqttx pub -t 'hello' -h 'braingeneers.gi.ucsc.edu' -p 1883 -m 'from MQTTX CLI'

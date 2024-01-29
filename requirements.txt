@@ -10,9 +10,7 @@ apsw
 streamlit
 watchdog
 
-# pynwb
-# braingeneers[all] @ git+https://github.com/braingeneers/braingeneerspy.git
-# vaex
+# braingeneers @ git+https://github.com/braingeneers/braingeneerspy.git
 
 ipython
 pylint

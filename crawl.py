@@ -5,10 +5,10 @@ Crawl the braingeneers prp top level experiment types (ephys, imaging etc...) an
 import os
 import random
 import argparse
+import datetime
 from collections import namedtuple
 from operator import attrgetter
-
-from tqdm import tqdm
+import tqdm
 
 import apsw
 
@@ -170,6 +170,8 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    print(f"Starting crawl at {datetime.datetime.now()}")
+
     conn = apsw.Connection("data/braingeneers.db")
 
     if args.delete:
@@ -198,7 +200,7 @@ if __name__ == "__main__":
     all_paths = set(
         [
             p[0].rstrip("/")
-            for t in tqdm(modalities)
+            for t in tqdm.tqdm(modalities)
             for p in s3list(client=s3, bucket=args.bucket, path=t, recursive=False)
         ]
     )
@@ -211,14 +213,15 @@ if __name__ == "__main__":
         new_paths = random.sample(list(new_paths), args.count)
 
     print("Search new paths for metadata.json")
-    for path in (progress := tqdm(new_paths)):
+    file_log = tqdm.tqdm(total=0, position=1, bar_format="{desc}")
+    for path in (progress := tqdm.tqdm(new_paths, desc="Keys", position=0)):
         key = f"{path}/metadata.json"
 
         # NOTE: A few experiments have manifest.json instead of metadata.json, ignoring
         if not key_exists(s3, args.bucket, key):
             continue
 
-        progress.set_description(path)
+        file_log.set_description_str(f"Current path: {path}")
 
         res = s3.get_object(Bucket=args.bucket, Key=key)
         content = res.get("Body").read()
@@ -236,9 +239,11 @@ if __name__ == "__main__":
             ),
         )
 
+    file_log.clear()
+
     oldest = conn.execute("SELECT MIN(last_modified) FROM experiments;").fetchone()[0]
     newest = conn.execute("SELECT MAX(last_modified) FROM experiments;").fetchone()[0]
     print(f"Oldest: {oldest}")
     print(f"Newest: {newest}")
 
-    print("Done.")
+    print(f"Finished crawl at {datetime.datetime.now()}")
