@@ -10,6 +10,8 @@ apsw
 streamlit
 watchdog
 
+flask
+
 # braingeneers @ git+https://github.com/braingeneers/braingeneerspy.git
 
 ipython

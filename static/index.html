@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nwb view</title>
+</head>
+
+<body>
+    <div>H5 via WASM</div>
+</body>
+
+<script type="module">
+    const worker = new Worker("worker.js", { type: "module" });
+
+    worker.postMessage([2, 4]);
+
+    worker.onmessage = (e) => {
+        console.log("Result:", e.data);
+    };
+</script>
+
+</html>

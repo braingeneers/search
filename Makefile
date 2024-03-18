@@ -37,8 +37,24 @@ streamlit:
 		--client.toolbarMode="auto" \
 		--logger.level="info"
 
+server-debug:
+	flask --app server run --debug --port 5282
+
 list-bucket:
 	aws --endpoint https://s3-west.nrp-nautilus.io s3 ls s3://braingeneers
+
+	aws --endpoint https://s3-west.nrp-nautilus.io s3api get-bucket-cors --bucket braingeneers
+
+	open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-web-security
+
+	open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args --user-data-dir="/Users/rcurrie/gi/search/data/chrome" --disable-web-security
+
+	export SIGNEDURL=$(aws --endpoint https://s3-west.nrp-nautilus.io s3 presign --expires-in  86400 s3://braingeneers/ephys/2024-03-14-e-sharf-morg_acute/original/data/data.raw.h5)
+
+	curl -v -I $SIGNEDURL
+	curl -v -X HEAD $SIGNEDURL
+	
+	curl -s -D - -o /dev/null $SIGNEDURL
 
 list-experiment:
 	aws --endpoint https://s3-west.nrp-nautilus.io --profile prp-braingeneers \
@@ -56,3 +72,8 @@ mqtt-cli:
 	mqttx conn -h 'braingeneers.gi.ucsc.edu' -p 1883
 	mqttx sub -t 'hello' -h 'braingeneers.gi.ucsc.edu' -p 1883
 	mqttx pub -t 'hello' -h 'braingeneers.gi.ucsc.edu' -p 1883 -m 'from MQTTX CLI'
+
+
+# NWB
+http-server-run:
+	npx http-server --cors --verbose .
