@@ -75,14 +75,10 @@ mqtt-cli:
 
 
 # NWB
-http-server-run:
-	npx http-server --cors --verbose .
+# http-server-run:
+# 	npx http-server --cors --verbose .
 
 
-# Flet
-flet-debug-app:
-	flet run main.py
-
-flet-debug-web:
-	# flet run --web main.py
+debug-web:
 	uvicorn main:app --reload
+	# uvicorn main:app --reload --log-level debug --port 8000
