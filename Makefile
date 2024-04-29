@@ -1,3 +1,13 @@
+#
+# NiceGUI based Search UI
+#
+debug-server:
+	uvicorn main:app --reload
+	# uvicorn main:app --reload --log-level debug --port 8000
+
+#
+# Docker and Compose
+#
 build:
 	docker compose build
 
@@ -23,6 +33,9 @@ shell:
 		search /bin/bash
 		# --user app --workdir /home/app/code \
 
+#
+# SQLite crawler index
+#
 sqlite-init:
 	rm data/braingeneers.db
 	sqlite3 -init create.sql data/braingeneers.db .quit
@@ -31,54 +44,18 @@ sqlite-console:
 	# Shell using the installed sqlite3 vs. systems version
 	$$(brew --prefix)/opt/sqlite/bin/sqlite3 data/braingeneers.db
 
-streamlit:
-	streamlit run app.py \
-		--browser.gatherUsageStats=False \
-		--client.toolbarMode="auto" \
-		--logger.level="info"
-
-server-debug:
-	flask --app server run --debug --port 5282
-
+#
+# S3 Object Store on NRP
+#
 list-bucket:
 	aws --endpoint https://s3-west.nrp-nautilus.io s3 ls s3://braingeneers
-
-	aws --endpoint https://s3-west.nrp-nautilus.io s3api get-bucket-cors --bucket braingeneers
-
-	open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-web-security
-
-	open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args --user-data-dir="/Users/rcurrie/gi/search/data/chrome" --disable-web-security
-
-	export SIGNEDURL=$(aws --endpoint https://s3-west.nrp-nautilus.io s3 presign --expires-in  86400 s3://braingeneers/ephys/2024-03-14-e-sharf-morg_acute/original/data/data.raw.h5)
-
-	curl -v -I $SIGNEDURL
-	curl -v -X HEAD $SIGNEDURL
-	
-	curl -s -D - -o /dev/null $SIGNEDURL
 
 list-experiment:
 	aws --endpoint https://s3-west.nrp-nautilus.io --profile prp-braingeneers \
 		s3 ls s3://braingeneers/ephys/2022-04-24-e-connectoids-chip11350/
 
-mqtt-local:
-	docker run --init -it --rm --name mqtt \
-	--mount type=bind,source="$(pwd)"/emqx.conf,target=/opt/emqx/etc/emqx.conf \
-	--mount type=bind,source="$(pwd)"/emqx.conf,target=/opt/emqx/etc/emqx.conf \
-	emqx/emqx:5.1.0
+test-head:
+	curl -v -I localhost:8000/s3/ephys/2023-04-02-e-hc328_unperturbed/shared/hc3.28_hckcr1_chip16835_plated34.2_rec4.2.nwb
 
-mqtt-cli:
-	docker run -it --rm emqx/mqttx-cli
-
-	mqttx conn -h 'braingeneers.gi.ucsc.edu' -p 1883
-	mqttx sub -t 'hello' -h 'braingeneers.gi.ucsc.edu' -p 1883
-	mqttx pub -t 'hello' -h 'braingeneers.gi.ucsc.edu' -p 1883 -m 'from MQTTX CLI'
-
-
-# NWB
-# http-server-run:
-# 	npx http-server --cors --verbose .
-
-
-debug-web:
-	uvicorn main:app --reload
-	# uvicorn main:app --reload --log-level debug --port 8000
+test-get:
+	curl -v localhost:8000/s3/ephys/2023-04-02-e-hc328_unperturbed/shared/hc3.28_hckcr1_chip16835_plated34.2_rec4.2.nwb
