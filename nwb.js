@@ -17,7 +17,7 @@ export default {
       const worker = new Worker("/static/worker.js", { type: "module" });
 
       console.log("Posting to worker");
-      worker.postMessage([2, 4]);
+      worker.postMessage([this.path, 2, 4]);
 
       worker.onmessage = (e) => {
         console.log("Result:", e.data);
@@ -26,6 +26,16 @@ export default {
     reset() {
       this.t = 0;
     },
+    display(coords) {
+      console.log(coords)
+      const worker = new Worker("/static/worker.js", { type: "module" });
+
+      worker.postMessage([this.path, coords]);
+
+      worker.onmessage = (e) => {
+        console.log("Result:", e.data);
+      };
+    }
   },
   props: {
     path: String,

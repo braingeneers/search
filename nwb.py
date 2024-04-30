@@ -12,3 +12,6 @@ class NWB(Element, component="nwb.js"):
 
     def reset(self) -> None:
         self.run_method("reset")
+
+    def display(self, coords) -> None:
+        self.run_method("display", coords)

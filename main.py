@@ -173,6 +173,9 @@ def nwb(path: str):
         )
 
     ui.button("Reset", on_click=nwb_widget.reset).props("small outline")
+    ui.button(
+        "Display", on_click=lambda: nwb_widget.display([[1000000, 1000001], [0, 10]])
+    ).props("small outline")
 
 
 # Initialize and start application
