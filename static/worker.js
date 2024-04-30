@@ -4,7 +4,6 @@ console.log("Imported hdf5");
 
 
 onmessage = async function (e) {
-    console.log("In worker:", e.data);
     const { FS } = await h5wasm.ready;
 
     var url = `/s3/${e.data[0]}`;
@@ -15,10 +14,8 @@ onmessage = async function (e) {
 
     var data = file.get("/acquisition/ElectricalSeries/data");
 
-    // var slice = data.slice([[1000000, 1000001], [0, 10]]);
     var slice = data.slice(coords);
     console.log(slice);
-    // Should yield Uint16Array [400, 525, 184, 462, 1023, 430, 273, 515, 168, 446]
 
     this.postMessage(slice);
 }

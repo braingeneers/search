@@ -171,10 +171,8 @@ def nwb(path: str):
         nwb_widget = NWB(
             path, on_change=lambda e: ui.notify(f"The value changed to {e.args}.")
         )
-
-    ui.button("Reset", on_click=nwb_widget.reset).props("small outline")
     ui.button(
-        "Display", on_click=lambda: nwb_widget.display([[1000000, 1000001], [0, 10]])
+        "Display", on_click=lambda: nwb_widget.display([[1000000, 1000010], [0, 1000]])
     ).props("small outline")
 
 

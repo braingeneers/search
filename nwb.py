@@ -10,8 +10,5 @@ class NWB(Element, component="nwb.js"):
         self._props["path"] = path
         self.on("change", on_change)
 
-    def reset(self) -> None:
-        self.run_method("reset")
-
     def display(self, coords) -> None:
         self.run_method("display", coords)
