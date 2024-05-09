@@ -4,6 +4,10 @@ awscli
 tqdm
 
 pandas
+matplotlib
+
+pynwb
+nwbwidgets
 
 apsw
 
@@ -19,5 +23,7 @@ nicegui
 # braingeneers @ git+https://github.com/braingeneers/braingeneerspy.git
 
 ipython
+jupyter
+jupyter-console
 pylint
 black

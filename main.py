@@ -10,8 +10,8 @@ from functools import lru_cache
 import apsw
 import boto3
 
-from fastapi import FastAPI, Response, status
-from fastapi.responses import RedirectResponse, FileResponse
+from fastapi import FastAPI, Request, Response, status
+from fastapi.responses import RedirectResponse, StreamingResponse, FileResponse
 from nicegui import app, ui
 
 import crawl
@@ -41,11 +41,10 @@ def static(path: str):
 
 
 #
-# Proxy to presigned URLs from NRP S3 to facilitate direct client/browser
-# to object store access for large files
+# Proxy to URLs from NRP S3 to object store access for large files
 #
 @app.head("/s3/{path:path}", status_code=status.HTTP_204_NO_CONTENT)
-def s3_head(path, response: Response):
+async def s3_head(path, response: Response):
     """Handle HEAD request directly returning ContentLength"""
     logger.info("HEAD: %s", path)
     res = app.storage.s3.head_object(Bucket="braingeneers", Key=path)
@@ -57,8 +56,36 @@ def s3_head(path, response: Response):
     response.headers["Keep-Alive"] = "timeout=5"
 
 
-@app.get("/s3/{path:path}", response_class=RedirectResponse)
-def s3_get(path):
+@app.get("/s3/{path:path}")
+async def s3_get(path: str, request: Request):
+    """Proxy a GET with ranges to S3."""
+    logger.info("GET: %s", path)
+    print("Range", request.headers.get("Range", "").strip())
+    stream = app.storage.s3.get_object(
+        Bucket="braingeneers", Key=path, Range=request.headers.get("Range", "").strip()
+    )
+    return StreamingResponse(stream["Body"])
+
+
+#
+# Proxy to presigned URLs from NRP S3 to facilitate direct client/browser
+# to object store access for large files
+#
+@app.head("/presigned/{path:path}", status_code=status.HTTP_204_NO_CONTENT)
+def s3_presigned_head(path, response: Response):
+    """Handle HEAD request directly returning ContentLength"""
+    logger.info("HEAD: %s", path)
+    res = app.storage.s3.head_object(Bucket="braingeneers", Key=path)
+    response.headers["Accept-Ranges"] = "bytes"
+    response.headers["Cache-Control"] = "max-age=3600"
+    response.headers["Connection"] = "keep-alive"
+    response.headers["Content-Length"] = str(res["ContentLength"])
+    response.headers["Content-Type"] = res["ContentType"]
+    response.headers["Keep-Alive"] = "timeout=5"
+
+
+@app.get("/presigned/{path:path}", response_class=RedirectResponse)
+def s3_presigned_get(path):
     """Handle GET by returning a redirect to a presigned URL in the NRP S3"""
     logger.info("GET: %s", path)
     try:
@@ -168,12 +195,10 @@ def nwb(path: str):
     """Browse contents of NWB file using h5wasm to read directly."""
     print("Browsing nwb file:", path)
     with ui.card():
-        nwb_widget = NWB(
-            path, on_change=lambda e: ui.notify(f"The value changed to {e.args}.")
-        )
-    ui.button(
-        "Display", on_click=lambda: nwb_widget.display([[1000000, 1000010], [0, 1000]])
-    ).props("small outline")
+        nwb_widget = NWB(f"/s3/{path}", "/acquisition/ElectricalSeries/data")
+    ui.button("Display", on_click=lambda: nwb_widget.display([0, 10], 0, 5)).props(
+        "small outline"
+    )
 
 
 # Initialize and start application
