@@ -11,13 +11,6 @@ nwbwidgets
 
 apsw
 
-# streamlit
-# watchdog
-
-# flask
-
-# flit
-
 nicegui
 
 # braingeneers @ git+https://github.com/braingeneers/braingeneerspy.git
@@ -25,5 +18,4 @@ nicegui
 ipython
 jupyter
 jupyter-console
-pylint
 black

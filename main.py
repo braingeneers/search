@@ -18,7 +18,9 @@ import crawl
 from nwb import NWB
 
 
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
 
 # Initialize global s3 connection
 session = boto3.Session(profile_name=os.getenv("S3_PROFILE", "prp-braingeneers"))
@@ -56,15 +58,25 @@ async def s3_head(path, response: Response):
     response.headers["Keep-Alive"] = "timeout=5"
 
 
+@lru_cache(maxsize=32)
+async def get_object_stream(path: str, range: str):
+    return app.storage.s3.get_object(Bucket="braingeneers", Key=path, Range=range)[
+        "Body"
+    ].iter_chunks()
+
+
 @app.get("/s3/{path:path}")
-async def s3_get(path: str, request: Request):
+async def s3_get(path: str, request: Request) -> StreamingResponse:
     """Proxy a GET with ranges to S3."""
     logger.info("GET: %s", path)
-    print("Range", request.headers.get("Range", "").strip())
-    stream = app.storage.s3.get_object(
-        Bucket="braingeneers", Key=path, Range=request.headers.get("Range", "").strip()
+    range = request.headers.get("Range", "").strip()
+    logger.info("Range: %s", range)
+    # return StreamingResponse(get_object_stream(path, range))
+    return StreamingResponse(
+        app.storage.s3.get_object(Bucket="braingeneers", Key=path, Range=range)[
+            "Body"
+        ].iter_chunks()
     )
-    return StreamingResponse(stream["Body"])
 
 
 #
@@ -85,7 +97,7 @@ def s3_presigned_head(path, response: Response):
 
 
 @app.get("/presigned/{path:path}", response_class=RedirectResponse)
-def s3_presigned_get(path):
+def s3_presigned_get(path: str, request: Request):
     """Handle GET by returning a redirect to a presigned URL in the NRP S3"""
     logger.info("GET: %s", path)
     try:
@@ -123,8 +135,10 @@ def search(e):
 
 
 @ui.page("/")
-def home():
+async def home():
     """Search home page"""
+    await ui.context.client.connected()
+
     ui.image("logo.png").style(
         "display: block; margin-left: auto; margin-right: auto; height: 59px; width: 47px"
     )
@@ -157,7 +171,7 @@ def home():
 @lru_cache(maxsize=32)
 def list_objects(path):
     """Returns list of all objects under the given path recursively"""
-    print(f"Listing {path} objects recursively")
+    logger.info(f"Listing {path} objects recursively")
     return [
         p.key
         for p in crawl.s3list(
@@ -193,7 +207,7 @@ def experiment(path: str):
 @ui.page("/nwb/{path:path}")
 def nwb(path: str):
     """Browse contents of NWB file using h5wasm to read directly."""
-    print("Browsing nwb file:", path)
+    logger.info("Browsing nwb file: %s", path)
     with ui.card():
         nwb_widget = NWB(f"/s3/{path}", "/acquisition/ElectricalSeries/data")
     ui.button("Display", on_click=lambda: nwb_widget.display([0, 10], 0, 5)).props(
@@ -202,8 +216,4 @@ def nwb(path: str):
 
 
 # Initialize and start application
-fast_app = FastAPI()
-ui.run_with(fast_app, storage_secret="pick your private secret here")
-
-if __name__ == "__main__":
-    print("Please start the app with uvicorn")
+ui.run()

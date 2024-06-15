@@ -1,5 +1,5 @@
 // import h5wasm from "https://cdn.jsdelivr.net/npm/h5wasm@0.7.4/dist/esm/hdf5_hl.js";
-import h5wasm from "/static/hdf5_hl.js";
+import h5wasm from "/static/h5wasm/hdf5_hl.js";
 
 onmessage = async function (e) {
     const { FS } = await h5wasm.ready;
