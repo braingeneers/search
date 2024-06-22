@@ -12,7 +12,7 @@
 </body>
 
 <script type="module">
-    const worker = new Worker("static/worker.js", { type: "module" });
+    const worker = new Worker("/static/worker.js", { type: "module" });
 
     worker.postMessage([2, 4]);
 
