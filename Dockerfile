@@ -1,7 +1,7 @@
 FROM python:3.12-bullseye
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-   && apt-get -y install sqlite3 cron libhdf5-dev \
+   && apt-get -y install sqlite3 cron libhdf5-dev awscli \
    && apt-get autoremove -y && apt-get clean -y
 
 # Install before code so we don't re-install on every code change

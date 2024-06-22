@@ -1,18 +1,15 @@
-boto3
-awscli
+pandas==2.2
+matplotlib==3.9
 
-tqdm
+boto3==1.34.131
 
-pandas
-matplotlib
+apsw==3.46
+
+tqdm==4.66
+nicegui==1.4.27
 
 pynwb
 nwbwidgets
-
-apsw
-
-nicegui==1.4.27
-
 # braingeneers @ git+https://github.com/braingeneers/braingeneerspy.git
 
 ipython

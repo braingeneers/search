@@ -1,7 +1,7 @@
 #
 # NiceGUI based Search UI
 #
-up:
+run:
 	python main.py
 
 #
