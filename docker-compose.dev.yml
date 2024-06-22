@@ -32,7 +32,7 @@ services:
       - search-db:/root/data
     ports:
       # DEV ONLY: Forward to local machine for tunnel to browser
-      - "127.0.0.1:8501:8501"
+      - "127.0.0.1:8080:8080"
     expose:
       - 8501
     command:
@@ -41,6 +41,6 @@ services:
       - |
         sqlite3 -init create.sql data/braingeneers.db .quit
         cron
-        streamlit run app.py
+        python main.py
     networks:
       - braingeneers-net

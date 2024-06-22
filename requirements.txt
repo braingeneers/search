@@ -11,7 +11,7 @@ nwbwidgets
 
 apsw
 
-nicegui
+nicegui==1.4.27
 
 # braingeneers @ git+https://github.com/braingeneers/braingeneerspy.git
 

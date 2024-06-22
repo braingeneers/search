@@ -1,9 +1,8 @@
 #
 # NiceGUI based Search UI
 #
-debug-server:
-	uvicorn main:app --reload
-	# uvicorn main:app --reload --log-level debug --port 8000
+up:
+	python main.py
 
 #
 # Docker and Compose
@@ -45,17 +44,13 @@ sqlite-console:
 	$$(brew --prefix)/opt/sqlite/bin/sqlite3 data/braingeneers.db
 
 #
-# S3 Object Store on NRP
+# Experiment with nwb files for development of nwb browser
 #
-list-bucket:
-	aws --endpoint https://s3-west.nrp-nautilus.io s3 ls s3://braingeneers
-
 list-experiment:
-	aws --endpoint https://s3-west.nrp-nautilus.io --profile prp-braingeneers \
-		s3 ls s3://braingeneers/ephys/2022-04-24-e-connectoids-chip11350/
+	aws s3 ls s3://braingeneers/ephys/2023-04-02-e-hc328_unperturbed/
 
 test-head:
-	curl -v -I localhost:8000/s3/ephys/2023-04-02-e-hc328_unperturbed/shared/hc3.28_hckcr1_chip16835_plated34.2_rec4.2.nwb
+	curl -v -I localhost:8080/s3/ephys/2023-04-02-e-hc328_unperturbed/shared/hc3.28_hckcr1_chip16835_plated34.2_rec4.2.nwb
 
 test-get:
-	curl -v localhost:8000/s3/ephys/2023-04-02-e-hc328_unperturbed/shared/hc3.28_hckcr1_chip16835_plated34.2_rec4.2.nwb
+	curl -v localhost:8080/s3/ephys/2023-04-02-e-hc328_unperturbed/shared/hc3.28_hckcr1_chip16835_plated34.2_rec4.2.nwb

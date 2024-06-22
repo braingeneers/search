@@ -41,6 +41,6 @@ services:
       - |
         sqlite3 -init create.sql data/braingeneers.db .quit
         cron
-        streamlit run app.py
+        python main.py
     networks:
       - braingeneers-net
