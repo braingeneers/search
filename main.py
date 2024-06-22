@@ -187,7 +187,7 @@ def list_objects(path):
 @ui.page("/experiment/{path:path}")
 def experiment(path: str):
     """Single experiment UI with metadata.json and all files listed."""
-    ui.markdown(f"# {path}")
+    ui.markdown(f"# {path.replace('_', '\_')}")
     ui.markdown("## objects:")
     paths = list_objects(path)
     with ui.list().props("dense separator"):
