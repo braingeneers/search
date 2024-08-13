@@ -6,7 +6,7 @@ boto3==1.34.131
 apsw==3.46
 
 tqdm==4.66
-nicegui==1.4.27
+nicegui==1.4.34
 
 pynwb
 nwbwidgets

@@ -12,8 +12,12 @@ export default {
     };
   },
   mounted() {
+    console.log("Mounted");
     this.canvas = this.$el;
     this.ctx = this.canvas.getContext('2d');
+  },
+  delete() {
+    console.log("Unmounted");
   },
   methods: {
     display(channels, start, duration) {
