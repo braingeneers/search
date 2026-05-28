@@ -229,13 +229,16 @@ if __name__ == "__main__":
 
         conn.execute(
             """
-                INSERT INTO experiments (uuid, path, last_modified, metadata) VALUES (?, ?, ?, ?);
+                INSERT INTO experiments (uuid, path, last_modified, metadata)
+                SELECT ?, ?, ?, ?
+                WHERE NOT EXISTS (SELECT 1 FROM experiments WHERE path = ?);
                 """,
             (
                 path.split("/")[1],
                 path,
                 last_modified.strftime("%Y-%m-%d"),
                 content.decode("utf-8"),
+                path,
             ),
         )
 
