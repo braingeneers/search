@@ -1,4 +1,7 @@
 # Braingeneers Search
+
+> **Deprecated:** This repository is no longer maintained. Its functionality has been merged into the Braingeneers Data Explorer service at [data-explorer.braingeneers.gi.ucsc.edu](https://data-explorer.braingeneers.gi.ucsc.edu). Use the Data Explorer service and its repository, [braingeneers/data-explorer](https://github.com/braingeneers/data-explorer), for current development and operations.
+
 Bringeneers NRP bucket crawler with experiment and file explorer hosted at [search.braingeneers.gi.ucsc.edu](search.braingeneers.gi.ucsc.edu)
 
 NOTE: 2023-04-02-e-hc328_unperturbed containes primary and spike sorted NWB files
